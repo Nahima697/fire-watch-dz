@@ -12,3 +12,7 @@ RAISONS: (liste précise si FAIL)
 DÉCISIONS D'ARCHITECTURE DÉJÀ VALIDÉES POUR CE PROJET (ne pas re-contester) :
 - Les mutations simples (upvote, changement de statut) depuis le client via le client Supabase 'anon' sont un choix assumé pour cette v1 sans authentification. La protection est déjà en place côté base de données (REVOKE/GRANT restreint aux colonnes upvotes/status, RLS actif). Ne pas demander de Route Handler serveur pour ce type d'opération - c'est de la sur-ingénierie pour ce contexte.
 - Pas de hooks custom séparés, pas d'AbortController, logique simple directement dans les composants - choix volontaire de simplicité pour cette v1.
+
+CLARIFICATIONS SUPPLÉMENTAIRES (ne pas re-contester) :
+- /api/fires retourne les données satellite NASA FIRMS (type SatelliteFire), PAS les fire_reports de la table Supabase. Ce sont deux sources de données distinctes et volontairement séparées (satellite + signalements citoyens), affichées ensemble sur la même carte. Charger les deux séparément (un fetch vers /api/fires, un select Supabase vers fire_reports) N'EST PAS une duplication.
+- La règle "upvotes >= 3 -> status confirme" calculée côté client est un choix v1 déjà tranché (voir plus haut dans ce fichier). Ne plus redemander de trigger PostgreSQL pour cette règle, ce point est définitivement clos pour la v1.
