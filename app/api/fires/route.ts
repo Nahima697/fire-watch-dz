@@ -56,7 +56,7 @@ export async function GET() {
       // pour exclure les detections a faible fiabilite, comme le recommande NASA FIRMS.
       if (confidenceIndex !== -1) {
         const confidence = cols[confidenceIndex];
-        if (confidence !== 'h' && confidence !== 'high') {
+        if (confidence === 'l' || confidence === 'low') {
           continue;
         }
       }
