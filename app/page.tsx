@@ -61,7 +61,7 @@ export default function Home() {
       <EmergencyHeader satelliteCount={satelliteCount} citizenReportsCount={citizenReportsCount} />
       <LiveMap />
       <button
-        className="fixed bottom-4 right-4 z-50 bg-red-600 text-white px-6 py-3 rounded-full shadow-lg"
+        className="fixed bottom-4 right-4 z-[9999] bg-red-600 text-white px-6 py-3 rounded-full shadow-lg"
         onClick={() => setIsModalOpen(true)}
       >
         Signaler un départ de feu 🔥
