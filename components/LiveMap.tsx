@@ -84,7 +84,7 @@ export default function LiveMap() {
 
   return (
     <div>
-      <MapContainer center={[28.0339, 1.6596]} zoom={6} style={{ height: '100vh', width: '100%' }}>
+      <MapContainer center={[28.0339, 1.6596]} zoom={5} style={{ height: '100vh', width: '100%' }}>
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution="&copy; OpenStreetMap"

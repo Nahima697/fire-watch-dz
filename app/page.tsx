@@ -22,7 +22,16 @@ export default function Home() {
         .select("*", { count: "exact", head: true })
         .neq("status", "maitrise");
 
-      setActiveFiresCount(count || 0);
+      let satelliteCount = 0;
+      try {
+        const res = await fetch("/api/fires");
+        const satelliteFires = await res.json();
+        satelliteCount = Array.isArray(satelliteFires) ? satelliteFires.length : 0;
+      } catch (err) {
+        console.error(err);
+      }
+
+      setActiveFiresCount((count || 0) + satelliteCount);
     };
 
     fetchCount();
