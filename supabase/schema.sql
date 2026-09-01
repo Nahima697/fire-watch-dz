@@ -67,3 +67,7 @@ CREATE POLICY allow_update_upvotes_status
   USING (true)
   WITH CHECK (true);
 ```
+-- Migration : ajout du support photo + verification IA
+ALTER TABLE fire_reports ADD COLUMN IF NOT EXISTS image_url TEXT;
+ALTER TABLE fire_reports ADD COLUMN IF NOT EXISTS ai_verified BOOLEAN DEFAULT NULL;
+ALTER TABLE fire_reports ADD COLUMN IF NOT EXISTS ai_confidence INTEGER DEFAULT NULL;

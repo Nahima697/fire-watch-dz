@@ -28,3 +28,10 @@ export type NewFireReportInput = {
   description?: string;
   device_fingerprint?: string;
 };
+
+export type FireAnalysisResult = {
+  is_fire: boolean;
+  confidence: number;
+  detected_elements: string[];
+  summary: string;
+};
