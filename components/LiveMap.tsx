@@ -86,7 +86,7 @@ export default function LiveMap() {
     <div>
       <MapContainer center={[28.0339, 1.6596]} zoom={5} style={{ height: '100vh', width: '100%' }}>
         <TileLayer
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          url="https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png"
           attribution="&copy; OpenStreetMap"
         />
         <RecenterButton userPosition={userPosition} />
