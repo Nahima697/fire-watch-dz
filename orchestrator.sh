@@ -28,7 +28,7 @@ while IFS= read -r line || [ -n "$line" ]; do
     echo "👨‍💻 [DEVELOPER] $FILE..."
     DEV_ROLE=$(cat agents/developer/agent.md)
     CONTRACT=$(cat prompts/AI_CONTRACT.md 2>/dev/null)
-    STRUCTURE=$(find src/ -type f | sed 's/^/ - /')
+    STRUCTURE=$(find app/ components/ lib/ supabase/ -type f 2>/dev/null | sed 's/^/ - /')
     CURRENT=$(cat "$FILE" 2>/dev/null || echo "Nouveau fichier.")
     echo "$DEV_ROLE
 
@@ -57,7 +57,7 @@ echo ""
 echo "🏛️ [TECH LEAD] Vérification architecture..."
 TL_ROLE=$(cat agents/tech_lead/agent.md)
 TL_FAILED=0
-STRUCTURE=$(find src/ -type f | sed 's/^/ - /')
+STRUCTURE=$(find app/ components/ lib/ supabase/ -type f 2>/dev/null | sed 's/^/ - /')
 for f in $MODIFIED_FILES; do
     CONTENT=$(cat "$f")
     echo "$TL_ROLE
