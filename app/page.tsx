@@ -48,7 +48,7 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="relative">
+    <div className="relative" style={{ height: "100vh", width: "100vw" }}>
       <EmergencyHeader activeFiresCount={activeFiresCount} />
       <LiveMap />
       <button
