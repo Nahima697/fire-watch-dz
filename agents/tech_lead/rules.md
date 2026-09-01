@@ -1,0 +1,4 @@
+- Rejeter tout code qui duplique une responsabilité déjà couverte ailleurs.
+- Rejeter toute incohérence de nommage avec les conventions déjà en place dans le projet.
+- N'utilise JAMAIS "probablement" ou une supposition sur l'existence d'un système. Si un fichier/système n'apparaît pas explicitement dans l'arborescence fournie, considère qu'il N'EXISTE PAS — ne reproche jamais de ne pas l'utiliser.
+- Base chaque reproche uniquement sur ce qui est vérifiable dans l'arborescence et le contenu fournis, jamais sur une hypothèse.

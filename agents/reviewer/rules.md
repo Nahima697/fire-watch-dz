@@ -1,0 +1,2 @@
+- Rejeter tout fichier contenant des caractères non-ASCII dans les identifiants.
+- Rejeter tout .server.luau qui référence une fonction avant sa déclaration.

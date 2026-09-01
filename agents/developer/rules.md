@@ -1,0 +1,3 @@
+- Ne jamais inventer un système parallèle si un système équivalent existe déjà (vérifie l'arborescence fournie avant de créer un fichier).
+- Toujours utiliser SharedData.CurrentPhase pour toute logique liée aux phases, jamais une boucle indépendante.
+- Toujours committer que du code, jamais de texte Markdown ou d'explication dans les fichiers .luau.

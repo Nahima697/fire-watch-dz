@@ -1,0 +1,3 @@
+- Ne jamais proposer de valeur d'équilibrage sans la chiffrer précisément (pas de "un peu plus fort", donne un nombre).
+- Toujours vérifier la cohérence avec GameConfig.lua existant avant d'inventer une nouvelle constante.
+- Ne jamais proposer de mécanique qui casse le rythme jour(120s)/vote(60s)/nuit(90s) déjà en place.

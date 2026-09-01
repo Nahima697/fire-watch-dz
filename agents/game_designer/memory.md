@@ -1,0 +1,1 @@
+- Décision du 02/08 : le monde utilise des prefabs importés dans ReplicatedStorage.Prefabs, MAIS la génération automatique par scan/pattern-matching a échoué (village invisible, terrain corrompu). Le monde a été reconstruit à la main. Ne PAS reproposer de scan automatique des prefabs sans validation explicite d'une liste de noms précis par l'utilisateur.

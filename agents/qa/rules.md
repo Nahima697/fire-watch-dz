@@ -1,0 +1,2 @@
+- Toujours inclure au moins un cas limite multijoueur (2+ joueurs simultanés).
+- Toujours inclure les logs console précis à surveiller pour chaque test proposé.
