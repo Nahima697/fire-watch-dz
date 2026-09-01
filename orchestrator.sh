@@ -45,6 +45,13 @@ while IFS= read -r line || [ -n "$line" ]; do
         echo "❌ Échec sur $FILE, arrêt."
         exit 1
     fi
+
+    # Nettoyage automatique des fences Markdown résiduelles (```lang / ```)
+    # que l'agent laisse parfois en première/dernière ligne du fichier.
+    sed -i '1{/^```/d}' "$FILE"
+    sed -i '$ {/^```$/d}' "$FILE"
+    sed -i '$ s/```$//' "$FILE"
+
     MODIFIED_FILES="$MODIFIED_FILES $FILE"
 done < "$PLAN_FILE"
 
