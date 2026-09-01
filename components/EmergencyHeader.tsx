@@ -37,7 +37,7 @@ export default function EmergencyHeader({ satelliteCount, citizenReportsCount }:
             Numéro Vert 1021
           </a>
         </div>
-        <div className="ml-auto flex-shrink-0 flex gap-4">
+        <div className="w-full sm:w-auto sm:ml-auto flex flex-wrap gap-3 mt-2 sm:mt-0">
           <div className="flex items-center gap-2">
             <span
               className="pulse-animation rounded-full"
