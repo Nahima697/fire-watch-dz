@@ -70,7 +70,7 @@ $STRUCTURE
 $CONTENT" > /tmp/tl_prompt_$$.md
     "$HERMES_PYTHON" ~/hermes/agent.py /tmp/tl_prompt_$$.md /tmp/tl_result_$$.txt
     cat /tmp/tl_result_$$.txt
-    grep -q "VERDICT: PASS" /tmp/tl_result_$$.txt || TL_FAILED=1
+    grep -qE "VERDICT:? *\**PASS" /tmp/tl_result_$$.txt || TL_FAILED=1
 done
 
 if [ $TL_FAILED -eq 1 ]; then
@@ -87,7 +87,7 @@ echo ""
 echo "🔎 [REVIEWER] Revue qualité..."
 REVIEW_FAILED=0
 for f in $MODIFIED_FILES; do
-    "$HERMES_PYTHON" ~/hermes/reviewer.py <(echo "$FEATURE") "$f"
+    "$HERMES_PYTHON" ~/hermes/reviewer.py <(echo "$FEATURE") "$f" prompts/reviewer_context.md
     [ $? -ne 0 ] && REVIEW_FAILED=1
 done
 

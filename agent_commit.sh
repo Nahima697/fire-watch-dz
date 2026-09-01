@@ -25,7 +25,7 @@ else
 fi
 
 git commit -m "$COMMIT_MSG"
-git push origin master
+git push origin main
 if [ $? -ne 0 ]; then
   echo "⚠️  Commit local OK, mais le push a échoué."
   exit 1
