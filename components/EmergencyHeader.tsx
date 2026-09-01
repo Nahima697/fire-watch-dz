@@ -1,105 +1,72 @@
 "use client";
 
 interface EmergencyHeaderProps {
-  activeFiresCount: number;
+  satelliteCount: number;
+  citizenReportsCount: number;
 }
 
-export default function EmergencyHeader({ activeFiresCount }: EmergencyHeaderProps) {
-  const dotColor = activeFiresCount === 0 ? '#10b981' : activeFiresCount >= 1 && activeFiresCount <= 5 ? '#f59e0b' : '#ef4444';
-
+export default function EmergencyHeader({ satelliteCount, citizenReportsCount }: EmergencyHeaderProps) {
   return (
     <>
-      <style dangerouslySetInnerHTML={{
-        __html: `
-          @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-          }
-          .pulse-dot {
-            animation: pulse 2s ease-in-out infinite;
-          }
-          .emergency-btn-mobile .short-text {
-            display: none;
-          }
-          @media (max-width: 640px) {
-            .emergency-btn-mobile .full-text {
-              display: none;
-            }
-            .emergency-btn-mobile .short-text {
-              display: inline;
-            }
-          }
-        `
-      }} />
-      <div style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        zIndex: 2000,
-        backgroundColor: '#f8f9fa',
-        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-        padding: '12px',
-        display: 'flex',
-        flexWrap: 'wrap',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        gap: '12px'
-      }}>
-        <div style={{ fontWeight: 'bold', fontSize: '18px' }}>
-          Fire Watch DZ
+      <style jsx>{`
+        @keyframes pulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.5; }
+        }
+        .pulse-animation {
+          animation: pulse 2s infinite;
+        }
+      `}</style>
+      <div className="sticky top-0 z-50 bg-white flex flex-wrap items-center gap-4 px-4 py-3">
+        <div className="flex-shrink-0">
+          <h1 className="text-lg font-bold" style={{ color: '#333333' }}>Fire Watch DZ</h1>
         </div>
-        <div style={{ display: 'flex', gap: '8px' }}>
+        <div className="flex gap-2">
           <a
             href="tel:14"
-            className="emergency-btn-mobile"
-            style={{
-              padding: '10px 16px',
-              backgroundColor: '#c41e3a',
-              color: 'white',
-              borderRadius: '8px',
-              textDecoration: 'none',
-              fontWeight: '600',
-              fontSize: '14px',
-              display: 'inline-block',
-              whiteSpace: 'nowrap'
-            }}
+            className="px-3 py-2 rounded font-semibold text-sm"
+            style={{ backgroundColor: '#dc2626', color: '#ffffff' }}
           >
-            <span className="full-text">📞 Protection Civile (14)</span>
-            <span className="short-text">📞 14</span>
+            Protection Civile 14
           </a>
           <a
             href="tel:1021"
-            className="emergency-btn-mobile"
-            style={{
-              padding: '10px 16px',
-              backgroundColor: '#c41e3a',
-              color: 'white',
-              borderRadius: '8px',
-              textDecoration: 'none',
-              fontWeight: '600',
-              fontSize: '14px',
-              display: 'inline-block',
-              whiteSpace: 'nowrap'
-            }}
+            className="px-3 py-2 rounded font-semibold text-sm"
+            style={{ backgroundColor: '#dc2626', color: '#ffffff' }}
           >
-            <span className="full-text">📞 Numéro Vert (1021)</span>
-            <span className="short-text">📞 1021</span>
+            Numéro Vert 1021
           </a>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <span
-            className="pulse-dot"
-            style={{
-              width: '10px',
-              height: '10px',
-              borderRadius: '50%',
-              backgroundColor: dotColor
-            }}
-          />
-          <span style={{ fontSize: '14px', fontWeight: '500' }}>
-            {activeFiresCount} foyer(s) actif(s)
-          </span>
+        <div className="ml-auto flex-shrink-0 flex gap-4">
+          <div className="flex items-center gap-2">
+            <span
+              className="pulse-animation rounded-full"
+              style={{ width: '8px', height: '8px', backgroundColor: '#f97316' }}
+            />
+            <div>
+              <div className="font-medium text-sm" style={{ color: '#333333' }}>
+                {satelliteCount} détections satellite (24h)
+              </div>
+              <div className="text-xs" style={{ color: '#777777' }}>
+                Anomalies thermiques NASA, non confirmées
+              </div>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <span
+              className={citizenReportsCount > 0 ? 'pulse-animation rounded-full' : 'rounded-full'}
+              style={{ 
+                width: '8px', 
+                height: '8px', 
+                backgroundColor: citizenReportsCount > 0 ? '#ef4444' : '#22c55e' 
+              }}
+            />
+            <div>
+              <div className="font-medium text-sm" style={{ color: '#333333' }}>
+                {citizenReportsCount} signalement(s) citoyen(s)
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </>

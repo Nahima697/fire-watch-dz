@@ -13,7 +13,8 @@ const LiveMap = dynamic(() => import("@/components/LiveMap"), {
 
 export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [activeFiresCount, setActiveFiresCount] = useState(0);
+  const [citizenReportsCount, setCitizenReportsCount] = useState(0);
+  const [satelliteCount, setSatelliteCount] = useState(0);
 
   useEffect(() => {
     const fetchCount = async () => {
@@ -22,16 +23,15 @@ export default function Home() {
         .select("*", { count: "exact", head: true })
         .neq("status", "maitrise");
 
-      let satelliteCount = 0;
+      setCitizenReportsCount(count || 0);
+
       try {
         const res = await fetch("/api/fires");
         const satelliteFires = await res.json();
-        satelliteCount = Array.isArray(satelliteFires) ? satelliteFires.length : 0;
+        setSatelliteCount(Array.isArray(satelliteFires) ? satelliteFires.length : 0);
       } catch (err) {
         console.error(err);
       }
-
-      setActiveFiresCount((count || 0) + satelliteCount);
     };
 
     fetchCount();
@@ -58,7 +58,7 @@ export default function Home() {
 
   return (
     <div className="relative" style={{ height: "100vh", width: "100vw" }}>
-      <EmergencyHeader activeFiresCount={activeFiresCount} />
+      <EmergencyHeader satelliteCount={satelliteCount} citizenReportsCount={citizenReportsCount} />
       <LiveMap />
       <button
         className="fixed bottom-4 right-4 z-50 bg-red-600 text-white px-6 py-3 rounded-full shadow-lg"
