@@ -27,6 +27,7 @@ export async function GET() {
     const brightIndex = header.indexOf('bright_ti4');
     const dateIndex = header.indexOf('acq_date');
     const timeIndex = header.indexOf('acq_time');
+    const confidenceIndex = header.indexOf('confidence');
     
     if (latIndex === -1 || lngIndex === -1 || brightIndex === -1 || dateIndex === -1 || timeIndex === -1) {
       return NextResponse.json([]);
@@ -49,6 +50,15 @@ export async function GET() {
       
       if (isNaN(lat) || isNaN(lng) || isNaN(brightness)) {
         continue;
+      }
+
+      // Filtre sur le niveau de confiance NASA (VIIRS : 'low' | 'nominal' | 'high')
+      // pour exclure les detections a faible fiabilite, comme le recommande NASA FIRMS.
+      if (confidenceIndex !== -1) {
+        const confidence = cols[confidenceIndex];
+        if (confidence !== 'h' && confidence !== 'high') {
+          continue;
+        }
       }
       
       fires.push({
