@@ -52,8 +52,6 @@ export async function GET() {
         continue;
       }
 
-      // Filtre sur le niveau de confiance NASA (VIIRS : 'low' | 'nominal' | 'high')
-      // pour exclure les detections a faible fiabilite, comme le recommande NASA FIRMS.
       if (confidenceIndex !== -1) {
         const confidence = cols[confidenceIndex];
         if (confidence === 'l' || confidence === 'low') {
@@ -71,7 +69,51 @@ export async function GET() {
       });
     }
     
-    return NextResponse.json(fires);
+    const clustered: SatelliteFire[] = [];
+    const used = new Set<number>();
+    
+    for (let i = 0; i < fires.length; i++) {
+      if (used.has(i)) {
+        continue;
+      }
+      
+      const cluster: SatelliteFire[] = [fires[i]];
+      used.add(i);
+      
+      for (let j = i + 1; j < fires.length; j++) {
+        if (used.has(j)) {
+          continue;
+        }
+        
+        if (Math.abs(fires[j].lat - fires[i].lat) < 0.02 && Math.abs(fires[j].lng - fires[i].lng) < 0.02) {
+          cluster.push(fires[j]);
+          used.add(j);
+        }
+      }
+      
+      const avgLat = cluster.reduce((sum, f) => sum + f.lat, 0) / cluster.length;
+      const avgLng = cluster.reduce((sum, f) => sum + f.lng, 0) / cluster.length;
+      const maxBrightness = Math.max(...cluster.map(f => f.brightness));
+      
+      let mostRecent = cluster[0];
+      for (const fire of cluster) {
+        if (fire.acquired_date > mostRecent.acquired_date || 
+            (fire.acquired_date === mostRecent.acquired_date && fire.acquired_time > mostRecent.acquired_time)) {
+          mostRecent = fire;
+        }
+      }
+      
+      clustered.push({
+        lat: avgLat,
+        lng: avgLng,
+        brightness: maxBrightness,
+        acquired_date: mostRecent.acquired_date,
+        acquired_time: mostRecent.acquired_time,
+        type: 'satellite'
+      });
+    }
+    
+    return NextResponse.json(clustered);
   } catch (error) {
     return NextResponse.json([]);
   }
