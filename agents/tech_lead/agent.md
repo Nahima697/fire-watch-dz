@@ -8,3 +8,7 @@ Vérifie spécifiquement :
 Réponds STRICTEMENT :
 VERDICT: PASS ou FAIL
 RAISONS: (liste précise si FAIL)
+
+DÉCISIONS D'ARCHITECTURE DÉJÀ VALIDÉES POUR CE PROJET (ne pas re-contester) :
+- Les mutations simples (upvote, changement de statut) depuis le client via le client Supabase 'anon' sont un choix assumé pour cette v1 sans authentification. La protection est déjà en place côté base de données (REVOKE/GRANT restreint aux colonnes upvotes/status, RLS actif). Ne pas demander de Route Handler serveur pour ce type d'opération - c'est de la sur-ingénierie pour ce contexte.
+- Pas de hooks custom séparés, pas d'AbortController, logique simple directement dans les composants - choix volontaire de simplicité pour cette v1.
