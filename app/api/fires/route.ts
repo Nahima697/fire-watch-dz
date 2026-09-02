@@ -12,14 +12,14 @@ export async function GET() {
     const response = await fetch(url);
     
     if (!response.ok) {
-      return NextResponse.json({ debug_error: 'NASA_NOT_OK', status: response.status, statusText: response.statusText });
+      return NextResponse.json([]);
     }
     
     const csvText = await response.text();
     const lines = csvText.trim().split('\n');
     
     if (lines.length < 2) {
-      return NextResponse.json({ debug_error: 'CSV_TOO_SHORT', lines_count: lines.length, first_100_chars: csvText.slice(0, 100) });
+      return NextResponse.json([]);
     }
     
     const header = lines[0].split(',');
@@ -31,7 +31,7 @@ export async function GET() {
     const confidenceIndex = header.indexOf('confidence');
     
     if (latIndex === -1 || lngIndex === -1 || brightIndex === -1 || dateIndex === -1 || timeIndex === -1) {
-      return NextResponse.json({ debug_error: 'MISSING_COLUMNS', header });
+      return NextResponse.json([]);
     }
     
     const fires: SatelliteFire[] = [];
@@ -116,6 +116,6 @@ export async function GET() {
     
     return NextResponse.json(clustered);
   } catch (error) {
-    return NextResponse.json({ debug_error: 'EXCEPTION', message: String(error) });
+    return NextResponse.json([]);
   }
 }
