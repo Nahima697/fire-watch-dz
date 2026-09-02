@@ -53,8 +53,11 @@ export default function CameraCapture({ onCapture, onCancel }: CameraCaptureProp
       />
 
       {!capturedImage && (
-        <button onClick={() => inputRef.current?.click()}>
-          Prendre une photo 📷
+        <button
+          onClick={() => inputRef.current?.click()}
+          className="w-full min-h-[60px] text-[18px] bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
+        >
+          📷 Prendre une photo
         </button>
       )}
 
