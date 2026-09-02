@@ -97,7 +97,7 @@ export default function LiveMap() {
           <Circle
             key={report.id}
             center={[report.latitude, report.longitude]}
-            radius={1000}
+            radius={4000}
             pathOptions={{
               color: report.status === 'maitrise'
                 ? 'gray'

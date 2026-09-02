@@ -138,7 +138,7 @@ export default function ReportModal({
         }
         setIsSubmitting(false);
       },
-      { enableHighAccuracy: true, timeout: 30000, maximumAge: 0 }
+      { enableHighAccuracy: true, timeout: 45000, maximumAge: 0 }
     );
   };
 
