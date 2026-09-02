@@ -64,81 +64,93 @@ export default function ReportModal({
 
     setIsSubmitting(true);
 
-    navigator.geolocation.getCurrentPosition(
-      async (position) => {
-        const device_fingerprint = `${navigator.userAgent}|${screen.width}x${screen.height}`;
+    const handleGeoSuccess = async (position: GeolocationPosition) => {
+      const device_fingerprint = `${navigator.userAgent}|${screen.width}x${screen.height}`;
 
-        let image_url: string | undefined = undefined;
-        let ai_verified: boolean | null = null;
-        let ai_confidence: number | null = null;
+      let image_url: string | undefined = undefined;
+      let ai_verified: boolean | null = null;
+      let ai_confidence: number | null = null;
 
-        if (capturedImage !== null) {
-          try {
-            const blob = await fetch(capturedImage).then((r) => r.blob());
-            const fileName = `${Date.now()}.webp`;
-            const { data: uploadData, error: uploadError } = await supabase.storage
+      if (capturedImage !== null) {
+        try {
+          const blob = await fetch(capturedImage).then((r) => r.blob());
+          const fileName = `${Date.now()}.webp`;
+          const { data: uploadData, error: uploadError } = await supabase.storage
+            .from("fire-reports")
+            .upload(fileName, blob);
+
+          if (uploadError) {
+            setUploadErrorMessage(uploadError.message);
+          } else {
+            const { data: { publicUrl } } = supabase.storage
               .from("fire-reports")
-              .upload(fileName, blob);
-
-            if (uploadError) {
-              setUploadErrorMessage(uploadError.message);
-            } else {
-              const { data: { publicUrl } } = supabase.storage
-                .from("fire-reports")
-                .getPublicUrl(fileName);
-              image_url = publicUrl;
-              if (aiAnalysis !== null) {
-                ai_verified = aiAnalysis.is_fire ?? null;
-                ai_confidence = aiAnalysis.confidence ?? null;
-              }
+              .getPublicUrl(fileName);
+            image_url = publicUrl;
+            if (aiAnalysis !== null) {
+              ai_verified = aiAnalysis.is_fire ?? null;
+              ai_confidence = aiAnalysis.confidence ?? null;
             }
-          } catch (err) {
-            setUploadErrorMessage("Erreur lors de l'upload de l'image");
           }
+        } catch (err) {
+          setUploadErrorMessage("Erreur lors de l'upload de l'image");
         }
+      }
 
-        const newReport: NewFireReportInput = {
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
-          gravity: gravity!,
-          description: description.trim() || undefined,
-          device_fingerprint: device_fingerprint,
-          ...(image_url && { image_url }),
-          ...(ai_verified !== null && { ai_verified }),
-          ...(ai_confidence !== null && { ai_confidence }),
-        };
+      const newReport: NewFireReportInput = {
+        latitude: position.coords.latitude,
+        longitude: position.coords.longitude,
+        gravity: gravity!,
+        description: description.trim() || undefined,
+        device_fingerprint: device_fingerprint,
+        ...(image_url && { image_url }),
+        ...(ai_verified !== null && { ai_verified }),
+        ...(ai_confidence !== null && { ai_confidence }),
+      };
 
-        const { error } = await supabase.from("fire_reports").insert(newReport);
+      const { error } = await supabase.from("fire_reports").insert(newReport);
 
-        if (error) {
-          setErrorMessage(error.message);
-          setIsSubmitting(false);
-          return;
-        }
-
-        localStorage.setItem("lastReportTimestamp", Date.now().toString());
-        setStep(1);
-        setGravity(null);
-        setDescription("");
-        setCapturedImage(null);
-        setAiAnalysis(null);
-        setUploadErrorMessage(null);
+      if (error) {
+        setErrorMessage(error.message);
         setIsSubmitting(false);
-        setErrorMessage(null);
-        if (onSuccess) onSuccess();
-        onClose();
-      },
+        return;
+      }
+
+      localStorage.setItem("lastReportTimestamp", Date.now().toString());
+      setStep(1);
+      setGravity(null);
+      setDescription("");
+      setCapturedImage(null);
+      setAiAnalysis(null);
+      setUploadErrorMessage(null);
+      setIsSubmitting(false);
+      setErrorMessage(null);
+      if (onSuccess) onSuccess();
+      onClose();
+    };
+
+    const handleGeoError = (geoError: GeolocationPositionError) => {
+      if (geoError.code === geoError.PERMISSION_DENIED) {
+        setErrorMessage("Géolocalisation refusée - autorisez la position dans les paramètres du navigateur");
+      } else {
+        setErrorMessage("Géolocalisation indisponible pour le moment, réessayez");
+      }
+      setIsSubmitting(false);
+    };
+
+    navigator.geolocation.getCurrentPosition(
+      handleGeoSuccess,
       (geoError) => {
         if (geoError.code === geoError.TIMEOUT) {
-          setErrorMessage("La localisation prend du temps, réessayez dans un endroit plus dégagé (extérieur de préférence)");
-        } else if (geoError.code === geoError.PERMISSION_DENIED) {
-          setErrorMessage("Géolocalisation refusée - autorisez la position dans les paramètres du navigateur");
+          navigator.geolocation.getCurrentPosition(
+            handleGeoSuccess,
+            handleGeoError,
+            { enableHighAccuracy: false, timeout: 20000, maximumAge: 0 }
+          );
         } else {
-          setErrorMessage("Géolocalisation indisponible pour le moment, réessayez");
+          handleGeoError(geoError);
         }
-        setIsSubmitting(false);
       },
-      { enableHighAccuracy: true, timeout: 45000, maximumAge: 0 }
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
     );
   };
 
