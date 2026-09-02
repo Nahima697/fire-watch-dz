@@ -49,109 +49,117 @@ export default function ReportModal({
         setAiAnalysis(data);
       }
     } catch (error) {
-      // Ne rien faire en cas d'erreur
     } finally {
       setIsAnalyzing(false);
     }
   };
 
+  const handleGeoErrorDisplay = (err: GeolocationPositionError) => {
+    let message: string;
+    if (err.code === 1) {
+      message = "Permission de géolocalisation refusée. Veuillez autoriser l'accès à votre position dans les paramètres du navigateur.";
+    } else if (err.code === 2) {
+      message = "Position indisponible. Vérifiez que votre appareil peut déterminer votre position.";
+    } else if (err.code === 3) {
+      message = "Délai d'attente dépassé (15 secondes). Vérifiez votre connexion et réessayez.";
+    } else {
+      message = "Erreur de géolocalisation. Veuillez réessayer.";
+    }
+    setErrorMessage(message);
+    setIsSubmitting(false);
+  };
+
+  const processSubmit = async (position: GeolocationPosition) => {
+    const latitude = position.coords.latitude;
+    const longitude = position.coords.longitude;
+
+    let image_url: string | undefined = undefined;
+    let ai_verified: boolean | null = null;
+    let ai_confidence: number | null = null;
+
+    if (capturedImage !== null) {
+      try {
+        const blob = await fetch(capturedImage).then((r) => r.blob());
+        const timestamp = Date.now();
+        const random = Math.random().toString(36).substring(2, 8);
+        const fileName = `report-${timestamp}-${random}.jpg`;
+        
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from("fire-photos")
+          .upload(fileName, blob);
+
+        if (uploadError) {
+          setUploadErrorMessage(uploadError.message);
+        } else {
+          const { data: { publicUrl } } = supabase.storage
+            .from("fire-photos")
+            .getPublicUrl(fileName);
+          image_url = publicUrl;
+          
+          if (aiAnalysis !== null) {
+            ai_verified = aiAnalysis.is_fire ?? null;
+            ai_confidence = aiAnalysis.confidence ?? null;
+          }
+        }
+      } catch (err) {
+        setUploadErrorMessage("Erreur lors de l'upload de l'image");
+      }
+    }
+
+    const newReport: NewFireReportInput = {
+      latitude: latitude,
+      longitude: longitude,
+      gravity: gravity!,
+      description: description.trim() || undefined,
+      device_fingerprint: `${navigator.userAgent}|${screen.width}x${screen.height}`,
+      ...(image_url && { image_url }),
+      ...(ai_verified !== null && { ai_verified }),
+      ...(ai_confidence !== null && { ai_confidence }),
+    };
+
+    const { error } = await supabase.from("fire_reports").insert(newReport);
+
+    if (error) {
+      setErrorMessage(error.message);
+      setIsSubmitting(false);
+      return;
+    }
+
+    localStorage.setItem("lastReportTime", Date.now().toString());
+    setStep(1);
+    setGravity(null);
+    setDescription("");
+    setCapturedImage(null);
+    setAiAnalysis(null);
+    setUploadErrorMessage(null);
+    setIsSubmitting(false);
+    setErrorMessage(null);
+    
+    if (onSuccess) onSuccess();
+    onClose();
+  };
+
   const handleSubmit = () => {
-    const lastTimestamp = localStorage.getItem("lastReportTimestamp");
-    if (lastTimestamp && Date.now() - parseInt(lastTimestamp) < 900000) {
+    const lastReportTime = localStorage.getItem("lastReportTime");
+    if (lastReportTime && Date.now() - parseInt(lastReportTime) < 900000) {
       setErrorMessage("Veuillez patienter 15 minutes entre deux signalements");
       return;
     }
 
     setIsSubmitting(true);
+    setErrorMessage(null);
 
-    // getCurrentPosition est appele en tout premier, de maniere synchrone,
-    // directement dans le handler onClick, pour respecter l'exigence de
-    // "user gesture" de Chrome/Safari sur les appels sensibles.
-    const handleGeoSuccess = async (position: GeolocationPosition) => {
-      const device_fingerprint = `${navigator.userAgent}|${screen.width}x${screen.height}`;
+    const geolocatePromise = new Promise<GeolocationPosition>((resolve, reject) => {
+      navigator.geolocation.getCurrentPosition(resolve, reject, {
+        enableHighAccuracy: false,
+        timeout: 15000,
+        maximumAge: 0
+      });
+    });
 
-      let image_url: string | undefined = undefined;
-      let ai_verified: boolean | null = null;
-      let ai_confidence: number | null = null;
-
-      if (capturedImage !== null) {
-        try {
-          const blob = await fetch(capturedImage).then((r) => r.blob());
-          const fileName = `${Date.now()}.webp`;
-          const { data: uploadData, error: uploadError } = await supabase.storage
-            .from("fire-reports")
-            .upload(fileName, blob);
-
-          if (uploadError) {
-            setUploadErrorMessage(uploadError.message);
-          } else {
-            const { data: { publicUrl } } = supabase.storage
-              .from("fire-reports")
-              .getPublicUrl(fileName);
-            image_url = publicUrl;
-            if (aiAnalysis !== null) {
-              ai_verified = aiAnalysis.is_fire ?? null;
-              ai_confidence = aiAnalysis.confidence ?? null;
-            }
-          }
-        } catch (err) {
-          setUploadErrorMessage("Erreur lors de l'upload de l'image");
-        }
-      }
-
-      const newReport: NewFireReportInput = {
-        latitude: position.coords.latitude,
-        longitude: position.coords.longitude,
-        gravity: gravity!,
-        description: description.trim() || undefined,
-        device_fingerprint: device_fingerprint,
-        ...(image_url && { image_url }),
-        ...(ai_verified !== null && { ai_verified }),
-        ...(ai_confidence !== null && { ai_confidence }),
-      };
-
-      const { error } = await supabase.from("fire_reports").insert(newReport);
-
-      if (error) {
-        setErrorMessage(error.message);
-        setIsSubmitting(false);
-        return;
-      }
-
-      localStorage.setItem("lastReportTimestamp", Date.now().toString());
-      setStep(1);
-      setGravity(null);
-      setDescription("");
-      setCapturedImage(null);
-      setAiAnalysis(null);
-      setUploadErrorMessage(null);
-      setIsSubmitting(false);
-      setErrorMessage(null);
-      if (onSuccess) onSuccess();
-      onClose();
-    };
-
-    const handleGeoError = (geoError: GeolocationPositionError) => {
-      if (geoError.code === geoError.PERMISSION_DENIED) {
-        setErrorMessage("Géolocalisation refusée - autorisez la position dans les paramètres du navigateur");
-      } else {
-        setErrorMessage("Géolocalisation indisponible pour le moment, réessayez");
-      }
-      setIsSubmitting(false);
-    };
-
-    console.log('[DEBUG] Appel getCurrentPosition, capturedImage taille:', capturedImage?.length);
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        console.log('[DEBUG] Position obtenue avec succes');
-        handleGeoSuccess(pos);
-      },
-      (err) => {
-        console.error('[DEBUG] Erreur geo dans ReportModal:', err.code, err.message);
-        handleGeoError(err);
-      },
-      { enableHighAccuracy: false, timeout: 15000 }
-    );
+    geolocatePromise
+      .then((position) => processSubmit(position))
+      .catch((err) => handleGeoErrorDisplay(err));
   };
 
   return (
@@ -262,18 +270,6 @@ export default function ReportModal({
                 disabled={isSubmitting}
               >
                 Retour
-              </button>
-              <button
-                onClick={() => {
-                  navigator.geolocation.getCurrentPosition(
-                    (pos) => alert(`TEST OK: ${pos.coords.latitude}`),
-                    (err) => alert(`TEST ERREUR: ${err.code} ${err.message}`),
-                    { enableHighAccuracy: false, timeout: 15000 }
-                  );
-                }}
-                className="flex-1 min-h-[60px] text-[18px] bg-green-600 text-white rounded-lg"
-              >
-                TEST GEO DIRECT
               </button>
               <button
                 onClick={handleSubmit}
