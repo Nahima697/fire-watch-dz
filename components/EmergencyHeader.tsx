@@ -111,7 +111,7 @@ export default function EmergencyHeader({
                 zIndex: 10000, 
                 maxHeight: '300px', 
                 overflowY: 'auto', 
-                minWidth: '280px', 
+                maxWidth: 'calc(100vw - 32px)', width: '280px', 
                 marginTop: '4px' 
               }}>
                 <div style={{ 
