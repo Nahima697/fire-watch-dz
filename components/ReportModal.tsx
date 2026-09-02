@@ -128,11 +128,17 @@ export default function ReportModal({
         if (onSuccess) onSuccess();
         onClose();
       },
-      () => {
-        setErrorMessage("Géolocalisation requise");
+      (geoError) => {
+        if (geoError.code === geoError.TIMEOUT) {
+          setErrorMessage("La localisation prend du temps, réessayez dans un endroit plus dégagé (extérieur de préférence)");
+        } else if (geoError.code === geoError.PERMISSION_DENIED) {
+          setErrorMessage("Géolocalisation refusée - autorisez la position dans les paramètres du navigateur");
+        } else {
+          setErrorMessage("Géolocalisation indisponible pour le moment, réessayez");
+        }
         setIsSubmitting(false);
       },
-      { timeout: 10000 }
+      { enableHighAccuracy: true, timeout: 30000, maximumAge: 0 }
     );
   };
 

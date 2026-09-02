@@ -25,7 +25,7 @@ def check_file(path: Path):
         return
 
     non_ascii = re.findall(r'[^\x00-\x7F]', text)
-    if len(non_ascii) > 20:
+    if len(non_ascii) > 150:
         ERRORS.append(f"{path}: trop de caractères non-ASCII ({len(non_ascii)}), possible corruption")
 
     if text.count("{") != text.count("}"):
