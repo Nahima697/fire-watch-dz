@@ -147,7 +147,7 @@ export default function ReportModal({
         console.error('[DEBUG] Erreur geo dans ReportModal:', err.code, err.message);
         handleGeoError(err);
       },
-      { enableHighAccuracy: false, timeout: 60000, maximumAge: 300000 }
+      { enableHighAccuracy: false, timeout: 15000, maximumAge: 0 }
     );
   };
 
