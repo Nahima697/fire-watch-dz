@@ -17,7 +17,7 @@ export default function EmergencyHeader({ satelliteCount, citizenReportsCount }:
           animation: pulse 2s infinite;
         }
       `}</style>
-      <div className="sticky top-0 z-50 bg-white flex flex-wrap items-center gap-4 px-4 py-3">
+      <div className="sticky top-0 z-[9999] bg-white flex flex-wrap items-center gap-4 px-4 py-3">
         <div className="flex-shrink-0">
           <h1 className="text-lg font-bold" style={{ color: '#333333' }}>Fire Watch DZ</h1>
         </div>
