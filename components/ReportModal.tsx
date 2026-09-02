@@ -152,7 +152,7 @@ export default function ReportModal({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 bg-black/50 z-[1500] flex items-center justify-center">
       <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold">Signaler un incendie</h2>
