@@ -137,9 +137,16 @@ export default function ReportModal({
       setIsSubmitting(false);
     };
 
+    console.log('[DEBUG] Appel getCurrentPosition, capturedImage taille:', capturedImage?.length);
     navigator.geolocation.getCurrentPosition(
-      handleGeoSuccess,
-      handleGeoError,
+      (pos) => {
+        console.log('[DEBUG] Position obtenue avec succes');
+        handleGeoSuccess(pos);
+      },
+      (err) => {
+        console.error('[DEBUG] Erreur geo dans ReportModal:', err.code, err.message);
+        handleGeoError(err);
+      },
       { enableHighAccuracy: false, timeout: 20000, maximumAge: 60000 }
     );
   };
