@@ -149,26 +149,23 @@ export default function ReportModal({
     setIsSubmitting(true);
     setErrorMessage(null);
 
-    navigator.geolocation.getCurrentPosition(
+    const watchId = navigator.geolocation.watchPosition(
       (position) => {
+        navigator.geolocation.clearWatch(watchId);
         console.log("🔥 POSITION OBTENUE :", position);
         processSubmit(position);
       },
       (err) => {
-        console.error("❌ GEOLOCATION ERROR :", {
-          code: err.code,
-          message: err.message,
-          PERMISSION_DENIED: err.PERMISSION_DENIED,
-          POSITION_UNAVAILABLE: err.POSITION_UNAVAILABLE,
-          TIMEOUT: err.TIMEOUT,
-        });
-        handleGeoErrorDisplay(err);
+        navigator.geolocation.clearWatch(watchId);
+        console.error("❌ GEOLOCATION ERROR, fallback sur position par defaut (centre Algerie) :", err.code, err.message);
+        setErrorMessage("Position GPS indisponible - signalement envoye avec position approximative (centre carte). Precisez la zone dans la description.");
+        const fallbackPosition = {
+          coords: { latitude: 36.7538, longitude: 3.0588, accuracy: 0, altitude: null, altitudeAccuracy: null, heading: null, speed: null },
+          timestamp: Date.now(),
+        } as GeolocationPosition;
+        processSubmit(fallbackPosition);
       },
-      {
-        enableHighAccuracy: false,
-        timeout: 30000,
-        maximumAge: 60000,
-      }
+      { enableHighAccuracy: false, timeout: 10000, maximumAge: Infinity }
     );
   };
 
