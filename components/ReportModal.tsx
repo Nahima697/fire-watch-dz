@@ -149,17 +149,27 @@ export default function ReportModal({
     setIsSubmitting(true);
     setErrorMessage(null);
 
-    const geolocatePromise = new Promise<GeolocationPosition>((resolve, reject) => {
-      navigator.geolocation.getCurrentPosition(resolve, reject, {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        console.log("🔥 POSITION OBTENUE :", position);
+        processSubmit(position);
+      },
+      (err) => {
+        console.error("❌ GEOLOCATION ERROR :", {
+          code: err.code,
+          message: err.message,
+          PERMISSION_DENIED: err.PERMISSION_DENIED,
+          POSITION_UNAVAILABLE: err.POSITION_UNAVAILABLE,
+          TIMEOUT: err.TIMEOUT,
+        });
+        handleGeoErrorDisplay(err);
+      },
+      {
         enableHighAccuracy: false,
-        timeout: 20000,
-        maximumAge: 300000
-      });
-    });
-
-    geolocatePromise
-      .then((position) => processSubmit(position))
-      .catch((err) => handleGeoErrorDisplay(err));
+        timeout: 30000,
+        maximumAge: 60000,
+      }
+    );
   };
 
   return (
