@@ -152,8 +152,8 @@ export default function ReportModal({
     const geolocatePromise = new Promise<GeolocationPosition>((resolve, reject) => {
       navigator.geolocation.getCurrentPosition(resolve, reject, {
         enableHighAccuracy: false,
-        timeout: 15000,
-        maximumAge: 0
+        timeout: 20000,
+        maximumAge: 300000
       });
     });
 
