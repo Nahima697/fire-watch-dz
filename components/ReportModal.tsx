@@ -261,6 +261,18 @@ export default function ReportModal({
                 Retour
               </button>
               <button
+                onClick={() => {
+                  navigator.geolocation.getCurrentPosition(
+                    (pos) => alert(`TEST OK: ${pos.coords.latitude}`),
+                    (err) => alert(`TEST ERREUR: ${err.code} ${err.message}`),
+                    { enableHighAccuracy: false, timeout: 15000 }
+                  );
+                }}
+                className="flex-1 min-h-[60px] text-[18px] bg-green-600 text-white rounded-lg"
+              >
+                TEST GEO DIRECT
+              </button>
+              <button
                 onClick={handleSubmit}
                 disabled={isSubmitting}
                 className="flex-1 min-h-[60px] text-[18px] bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400"
