@@ -12,6 +12,7 @@ export async function GET() {
     const response = await fetch(url);
     
     if (!response.ok) {
+      console.error('[analyze-fire] NASA FIRMS a repondu avec le statut:', response.status, response.statusText);
       return NextResponse.json([]);
     }
     
@@ -116,6 +117,7 @@ export async function GET() {
     
     return NextResponse.json(clustered);
   } catch (error) {
+    console.error('[analyze-fire] Exception attrapee:', error);
     return NextResponse.json([]);
   }
 }
