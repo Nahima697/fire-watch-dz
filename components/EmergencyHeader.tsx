@@ -102,16 +102,17 @@ export default function EmergencyHeader({
             </div>
             {isDropdownOpen && fireReports.length > 0 && (
               <div style={{ 
-                position: 'absolute', 
-                top: '100%', 
-                right: 0, 
+                position: 'fixed', 
+                top: '70px', 
+                left: '50%',
+                transform: 'translateX(-50%)',
                 backgroundColor: 'white', 
                 boxShadow: '0 4px 12px rgba(0,0,0,0.15)', 
                 borderRadius: '8px', 
                 zIndex: 10000, 
                 maxHeight: '300px', 
                 overflowY: 'auto', 
-                maxWidth: 'calc(100vw - 32px)', width: '280px', 
+                width: 'calc(100vw - 32px)', maxWidth: '320px', 
                 marginTop: '4px' 
               }}>
                 <div style={{ 
