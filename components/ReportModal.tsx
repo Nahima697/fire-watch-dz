@@ -85,14 +85,14 @@ export default function ReportModal({
         const fileName = `report-${timestamp}-${random}.jpg`;
         
         const { data: uploadData, error: uploadError } = await supabase.storage
-          .from("fire-photos")
+          .from("fire-reports")
           .upload(fileName, blob);
 
         if (uploadError) {
           setUploadErrorMessage(uploadError.message);
         } else {
           const { data: { publicUrl } } = supabase.storage
-            .from("fire-photos")
+            .from("fire-reports")
             .getPublicUrl(fileName);
           image_url = publicUrl;
           
