@@ -55,7 +55,7 @@ export default function ReportModal({
     }
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     const lastTimestamp = localStorage.getItem("lastReportTimestamp");
     if (lastTimestamp && Date.now() - parseInt(lastTimestamp) < 900000) {
       setErrorMessage("Veuillez patienter 15 minutes entre deux signalements");
@@ -64,6 +64,9 @@ export default function ReportModal({
 
     setIsSubmitting(true);
 
+    // getCurrentPosition est appele en tout premier, de maniere synchrone,
+    // directement dans le handler onClick, pour respecter l'exigence de
+    // "user gesture" de Chrome/Safari sur les appels sensibles.
     const handleGeoSuccess = async (position: GeolocationPosition) => {
       const device_fingerprint = `${navigator.userAgent}|${screen.width}x${screen.height}`;
 
@@ -147,7 +150,7 @@ export default function ReportModal({
         console.error('[DEBUG] Erreur geo dans ReportModal:', err.code, err.message);
         handleGeoError(err);
       },
-      { enableHighAccuracy: false, timeout: 15000, maximumAge: 0 }
+      { enableHighAccuracy: false, timeout: 15000 }
     );
   };
 
