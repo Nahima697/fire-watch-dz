@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import EmergencyHeader from "@/components/EmergencyHeader";
 import ReportModal from "@/components/ReportModal";
 import { supabase } from "@/lib/supabaseClient";
+import type { FireReport } from "@/lib/types";
 
 const LiveMap = dynamic(() => import("@/components/LiveMap"), {
   ssr: false,
@@ -15,15 +16,18 @@ export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [citizenReportsCount, setCitizenReportsCount] = useState(0);
   const [satelliteCount, setSatelliteCount] = useState(0);
+  const [fireReportsList, setFireReportsList] = useState<FireReport[]>([]);
+  const [focusedReport, setFocusedReport] = useState<FireReport | null>(null);
 
   useEffect(() => {
     const fetchCount = async () => {
-      const { count } = await supabase
+      const { data, count } = await supabase
         .from("fire_reports")
-        .select("*", { count: "exact", head: true })
+        .select("*", { count: "exact" })
         .neq("status", "maitrise");
 
       setCitizenReportsCount(count || 0);
+      setFireReportsList((data as FireReport[]) || []);
 
       try {
         const res = await fetch("/api/fires");
@@ -58,8 +62,13 @@ export default function Home() {
 
   return (
     <div className="relative" style={{ height: "100vh", width: "100vw" }}>
-      <EmergencyHeader satelliteCount={satelliteCount} citizenReportsCount={citizenReportsCount} />
-      <LiveMap />
+      <EmergencyHeader
+        satelliteCount={satelliteCount}
+        citizenReportsCount={citizenReportsCount}
+        fireReports={fireReportsList}
+        onSelectReport={(report: FireReport) => setFocusedReport(report)}
+      />
+      <LiveMap focusedReport={focusedReport} />
       <button
         className="fixed bottom-4 right-4 z-[9999] bg-red-600 text-white px-6 py-3 rounded-full shadow-lg"
         onClick={() => setIsModalOpen(true)}

@@ -7,6 +7,10 @@ import 'leaflet/dist/leaflet.css';
 import { FireReport, SatelliteFire } from '@/lib/types';
 import { useState, useEffect } from 'react';
 
+interface LiveMapProps {
+  focusedReport?: FireReport | null;
+}
+
 function RecenterButton({ userPosition }: { userPosition: [number, number] | null }) {
   const map = useMap();
   
@@ -32,7 +36,19 @@ function RecenterButton({ userPosition }: { userPosition: [number, number] | nul
   );
 }
 
-export default function LiveMap() {
+function FocusHandler({ focusedReport }: { focusedReport: FireReport | null }) {
+  const map = useMap();
+
+  useEffect(() => {
+    if (focusedReport !== null) {
+      map.flyTo([focusedReport.latitude, focusedReport.longitude], 14);
+    }
+  }, [focusedReport, map]);
+
+  return null;
+}
+
+export default function LiveMap({ focusedReport }: LiveMapProps) {
   const [userPosition, setUserPosition] = useState<[number, number] | null>(null);
   const [fireReports, setFireReports] = useState<FireReport[]>([]);
   const [satelliteFires, setSatelliteFires] = useState<SatelliteFire[]>([]);
@@ -90,6 +106,7 @@ export default function LiveMap() {
           attribution="&copy; OpenStreetMap"
         />
         <RecenterButton userPosition={userPosition} />
+        <FocusHandler focusedReport={focusedReport || null} />
         {userPosition && (
           <Circle center={userPosition} radius={500} pathOptions={{ color: 'blue' }} />
         )}
