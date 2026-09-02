@@ -139,18 +139,8 @@ export default function ReportModal({
 
     navigator.geolocation.getCurrentPosition(
       handleGeoSuccess,
-      (geoError) => {
-        if (geoError.code === geoError.TIMEOUT) {
-          navigator.geolocation.getCurrentPosition(
-            handleGeoSuccess,
-            handleGeoError,
-            { enableHighAccuracy: false, timeout: 20000, maximumAge: 0 }
-          );
-        } else {
-          handleGeoError(geoError);
-        }
-      },
-      { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+      handleGeoError,
+      { enableHighAccuracy: false, timeout: 20000, maximumAge: 60000 }
     );
   };
 
