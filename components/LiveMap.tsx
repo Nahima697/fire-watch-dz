@@ -143,8 +143,20 @@ export default function LiveMap({ focusedReport }: LiveMapProps) {
                       console.error(error);
                     }
                   }}
+                  style={{
+                    width: '100%',
+                    minHeight: '48px',
+                    fontSize: '16px',
+                    fontWeight: 600,
+                    backgroundColor: '#dc2626',
+                    color: 'white',
+                    borderRadius: '8px',
+                    border: 'none',
+                    marginTop: '8px',
+                    cursor: 'pointer',
+                  }}
                 >
-                  Confirmer la présence du feu
+                  🔥 Confirmer la présence du feu
                 </button>
               </div>
             </Popup>
